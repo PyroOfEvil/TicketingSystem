@@ -1,94 +1,113 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 
-namespace ConsoleApp20
+namespace ConsoleApp19
 {
     class Program
     {
         static void Main(string[] args)
         {
+            string file = "Tickets.txt";
+            string choice;
+            do
             {
-                
-                // ask for input
-                Console.WriteLine("Enter 1 to create data file.");
-                Console.WriteLine("Enter 2 to parse data.");
-                Console.WriteLine("Enter anything else to quit.");
+                // ask user a question
+                Console.WriteLine("1) Read data from file.");
+                Console.WriteLine("2) Create file from data.");
+                Console.WriteLine("Enter any other key to exit.");
                 // input response
-                string resp = Console.ReadLine();
+                choice = Console.ReadLine();
 
-                if (resp == "1")
+                if (choice == "1")
                 {
-                    // create data file
-
-                    // ask a question
-                    Console.WriteLine("How many weeks of data is needed?");
-                    // input the response (convert to int)
-                    int weeks = int.Parse(Console.ReadLine());
-
-                    // determine start and end date
-                    DateTime today = DateTime.Now;
-                    // we want full weeks sunday - saturday
-                    DateTime dataEndDate = today.AddDays(-(int) today.DayOfWeek);
-                    // subtract # of weeks from endDate to get startDate
-                    DateTime dataDate = dataEndDate.AddDays(-(weeks * 7));
-
-                    // random number generator
-                    Random rnd = new Random();
-
-                    // create file
-                    StreamWriter sw = new StreamWriter("data.txt");
-                    // loop for the desired # of weeks
-                    while (dataDate < dataEndDate)
+                    // read data from file
+                    if (File.Exists(file))
                     {
-                        // 7 days in a week
-                        int[] hours = new int[7];
-                        for (int i = 0; i < hours.Length; i++)
+                        // read data from file
+                        StreamReader sr = new StreamReader(file);
+                        while (!sr.EndOfStream)
                         {
-                            // generate random number of hours slept between 4-12 (inclusive)
-                            hours[i] = rnd.Next(4, 13);
+                            string line = sr.ReadLine();
+                            // convert string to array
+                            string[] arr = line.Split(',');
+                            // display array data
+                            Console.WriteLine("TicketID: {0}, Summary: {1}, Status: {2}, Priority: {3}, Submitter: {4}, Assigned: {5}, Watching: {6}",  
+                                arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6]);
+                        }
+                        sr.Close();
+                        
+                    }
+                    else
+                    {
+                        Console.WriteLine("File does not exist");
+                    }
+                }
+                else if (choice == "2")
+                {
+                    // create file from data
+                    StreamWriter sw = new StreamWriter(file);
+                    for (int i = 0; i < 7; i++)
+                    {
+                        // ask a question
+                        Console.WriteLine("Enter a Ticket (Y/N)?");
+                        // input the response
+                        string resp = Console.ReadLine().ToUpper();
+                        // if the response is anything other than "Y", stop asking
+                        if (resp != "Y") { break; }
+                        // prompt for TicketID
+                        Console.WriteLine("Enter the TicketID.");
+                        // save the TicketID
+                        string Id = Console.ReadLine();
+                        // prompt for Summary
+                        Console.WriteLine("Write a summary of the ticket.");
+                        // save the Summary
+                        string Summary = Console.ReadLine();
+                        //Prompt for Status
+                        Console.WriteLine("What is the status of the ticket?");
+                        //Save the Status
+                        String status = Console.ReadLine();
+                        //Prompt for priority
+                        Console.WriteLine("What is the priority of the ticket?");
+                        //save the priority
+                        String Priority = Console.ReadLine();
+                        //Prompt for submitter
+                        Console.WriteLine("Who is the submitter?");
+                        //Save the Submitter
+                        String Submitter = Console.ReadLine();
+                        //Prompt for Assigned
+                        Console.WriteLine("Who assigned the ticket?");
+                        //Save the Assigned
+                        String Assigned = Console.ReadLine();
+                        //Prompt for Watching
+                        Console.WriteLine("Whose watching the ticket?");
+                        //Save the watching
+                        String Watching = Console.ReadLine();
+                        bool Watchers = true;
+                        while (Watchers == true)
+                        {
+                            Console.WriteLine("Are there more watchers? Y/N");
+                            String Temp = Console.ReadLine();
+                            if (Temp == "Y")
+                            {
+                                Console.WriteLine("Who is watching?");
+                                Temp = Console.ReadLine();
+                                Watching = Watching + '|' + Temp;
+                            }
+                            else if (Temp == "N")
+                            {
+                                Watchers = false;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid entry");
+                            }                                
                         }
 
-                        // M/d/yyyy,#|#|#|#|#|#|#
-                        //Console.WriteLine($"{dataDate:M/d/yy},{string.Join("|", hours)}");
-                        sw.WriteLine($"{dataDate:MMM dd, yyyy},{string.Join("|", hours)}");
-                        // add 1 week to date
-                        dataDate = dataDate.AddDays(7);
+                        sw.WriteLine("{0},{1},{2},{3},{4},{5},{6}", Id, Summary, status, Priority, Submitter, Assigned, Watching);
                     }
-
                     sw.Close();
                 }
-                else if (resp == "2")
-                {
-                    // TODO: parse data file
-                    {
-                        if (File.Exists("data.txt"))
-                        {
-                            StreamReader sr = new StreamReader("data.txt");
-                            while (!sr.EndOfStream)
-                            {
-                                string line = sr.ReadLine();
-                                string[] arr = line.Split(',');
-                                
-
-                                Console.WriteLine("Week of {0},{1},", arr[0], arr[1]);
-                                Console.WriteLine("Mo Tu We Th Fr Sa Su");
-                                Console.WriteLine("-- -- -- -- -- -- --");
-                                Console.WriteLine("{1,20}", "[0]", arr[2]);
-                                Console.WriteLine();
-
-                            }
-                            sr.Close();
-                        
-                        }
-                        else
-                        {
-                            Console.WriteLine("File does not exist");
-                        }
-                    }
-
-                }
-            }
+            } while (choice == "1" || choice == "2");
         }
     }
 }
